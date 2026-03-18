@@ -1138,8 +1138,8 @@
             </div>
 
             <div class="cart-actions">
-                <button class="btn btn-clear" onclick="clearCart()">Limpar carrinho</button>
-                <button class="btn btn-whatsapp" onclick="sendToWhatsApp()">Enviar no WhatsApp</button>
+                <button type="button" class="btn btn-clear" onclick="clearCart()">Limpar carrinho</button>
+                <button type="button" class="btn btn-whatsapp" onclick="sendToWhatsApp()">Enviar no WhatsApp</button>
             </div>
         </div>
     </div>
@@ -1518,10 +1518,10 @@
               <h4>${item.name}</h4>
               <p>${formatPrice(item.price)} cada</p>
               <div class="qty-controls">
-                <button onclick="decreaseQty(${item.id})">-</button>
+                <button type="button" onclick="decreaseQty(${item.id})">-</button>
                 <span>${item.quantity}</span>
-                <button onclick="increaseQty(${item.id})">+</button>
-                <button class="remove-btn" onclick="removeItem(${item.id})">Remover</button>
+                <button type="button" onclick="increaseQty(${item.id})">+</button>
+                <button type="button" class="remove-btn" onclick="removeItem(${item.id})">Remover</button>
               </div>
             </div>
             <div style="font-weight:700; color:var(--gold);">
@@ -1564,6 +1564,11 @@
                 return;
             }
 
+            if (!deliveryAddress) {
+                alert("Digite o endereço para entrega.");
+                return;
+            }
+
             if (!paymentMethod) {
                 alert("Selecione a forma de pagamento.");
                 return;
@@ -1579,26 +1584,36 @@
                 paymentLabel = `Cartão de Crédito - ${installments}`;
             }
 
-            let message = `*Novo Pedido - Perfumes Árabes*%0A%0A`;
-            message += `*Nome:* ${customerName}%0A`;
-            if (deliveryAddress) {
-                message += `*Endereço para entrega:* ${deliveryAddress}%0A`;
-            }
-            message += `*Pagamento:* ${paymentLabel}%0A%0A`;
-            message += `*Itens do pedido:*%0A`;
+            let message = `*Novo Pedido - Perfumes Árabes*
+
+`;
+            message += `*Nome:* ${customerName}
+`;
+            message += `*Endereço para entrega:* ${deliveryAddress}
+`;
+            message += `*Pagamento:* ${paymentLabel}
+
+`;
+            message += `*Itens do pedido:*
+`;
 
             let total = 0;
 
             cart.forEach(item => {
                 const subtotal = item.price * item.quantity;
                 total += subtotal;
-                message += `- ${item.name} | Qtd: ${item.quantity} | ${formatPrice(subtotal)}%0A`;
+                message += `- ${item.name} | Qtd: ${item.quantity} | ${formatPrice(subtotal)}
+`;
             });
 
-            message += `%0A*Total:* ${formatPrice(total)}%0A`;
+            message += `
+*Total:* ${formatPrice(total)}`;
 
-            const url = `https://wa.me/${whatsappNumber}?text=${message}`;
-            window.open(url, "_blank");
+            const encodedMessage = encodeURIComponent(message);
+            const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+            // No mobile, window.open pode ser bloqueado. Redirecionar na mesma aba é mais confiável.
+            window.location.href = url;
         }
 
         window.addEventListener("click", (e) => {
